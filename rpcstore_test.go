@@ -21,11 +21,11 @@ import (
 	"testing"
 
 	"github.com/creachadair/ffs/blob/memstore"
-	"github.com/creachadair/ffs/blob/rpcstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/handler"
 	"github.com/creachadair/jrpc2/server"
+	"github.com/creachadair/rpcstore"
 )
 
 func TestStore(t *testing.T) {
