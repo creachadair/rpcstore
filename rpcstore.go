@@ -23,18 +23,30 @@ import (
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/jrpc2"
+	"github.com/creachadair/jrpc2/handler"
 )
 
 // Service implements a service that adapts RPC requests to a blob.Store.
 type Service struct {
 	st      blob.Store
 	newHash func() hash.Hash
+	svc     handler.Map
 }
 
 // NewService constructs a Service that delegates to the given blob.Store.
-func NewService(st blob.Store, opts *ServiceOpts) Service {
-	s := Service{st: st}
-	opts.set(&s)
+func NewService(st blob.Store, opts *ServiceOpts) *Service {
+	s := &Service{st: st}
+	opts.set(s)
+	s.svc = handler.Map{
+		"Get":    handler.New(s.Get),
+		"Put":    handler.New(s.Put),
+		"CASPut": handler.New(s.CASPut),
+		"CASKey": handler.New(s.CASKey),
+		"Delete": handler.New(s.Delete),
+		"Size":   handler.New(s.Size),
+		"List":   handler.New(s.List),
+		"Len":    handler.New(s.Len),
+	}
 	return s
 }
 
@@ -50,6 +62,9 @@ func (o *ServiceOpts) set(s *Service) {
 	}
 	s.newHash = o.Hash
 }
+
+// Methods returns a map of the service methods for s.
+func (s Service) Methods() jrpc2.Assigner { return s.svc }
 
 // Get handles the corresponding method of blob.Store.
 func (s Service) Get(ctx context.Context, req *KeyRequest) ([]byte, error) {

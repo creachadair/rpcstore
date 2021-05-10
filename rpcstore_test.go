@@ -23,7 +23,6 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/handler"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/rpcstore"
 )
@@ -32,7 +31,7 @@ func TestStore(t *testing.T) {
 	mem := memstore.New()
 	svc := rpcstore.NewService(mem, nil)
 
-	loc := server.NewLocal(handler.NewService(svc), nil)
+	loc := server.NewLocal(svc.Methods(), nil)
 
 	si, err := jrpc2.RPCServerInfo(context.Background(), loc.Client)
 	if err != nil {
@@ -53,7 +52,7 @@ func TestCAS(t *testing.T) {
 		Hash: sha1.New,
 	})
 
-	loc := server.NewLocal(handler.NewService(svc), nil)
+	loc := server.NewLocal(svc.Methods(), nil)
 	defer loc.Close()
 
 	// echo "abcde" | shasum -a 1
