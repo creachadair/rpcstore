@@ -1,8 +1,8 @@
 github.com/creachadair/atomicfile v0.2.1/go.mod h1:Tvr/wsb3lQY4dj+9utcmJ7Gp6wi3LKA8jRNqoxUhA2M=
 github.com/creachadair/ffs v0.0.0-20210911191118-dafc412c971c h1:CXyduTe27N/WrpEBkvLp+AFd+vJd7LGzC6fpByxx1bk=
 github.com/creachadair/ffs v0.0.0-20210911191118-dafc412c971c/go.mod h1:CSnP5V18bT/O59GgdLDcoir8FpeLjW7i8l6tOh+UMAE=
-github.com/creachadair/jrpc2 v0.24.0 h1:miPpdVKDyrk9URXBELTTgwqx8Rq1bjeFCjaQ+LawkpQ=
-github.com/creachadair/jrpc2 v0.24.0/go.mod h1:OaokvCiyGiCvI8hT/drVu2LJCFrqXR7hwuAYlsY3fDE=
+github.com/creachadair/jrpc2 v0.24.3 h1:mA3OUdSvkhEGLAACaQ/heUlLekPDuH0TIbKv9p7xo50=
+github.com/creachadair/jrpc2 v0.24.3/go.mod h1:w+GXZGc+NwsH0xsUOgeLBIIRM0jBOSTXhv28KaWGRZU=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/golang/snappy v0.0.4/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
