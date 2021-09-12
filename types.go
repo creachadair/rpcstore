@@ -74,7 +74,7 @@ var (
 // filterErr assigns stable error codes to important blob.Store errors so they
 // will survive transit through JSON-RPC.
 func filterErr(err error) error {
-	if errors.Is(err, blob.ErrKeyNotFound) {
+	if blob.IsKeyNotFound(err) {
 		return errKeyNotFound
 	} else if errors.Is(err, blob.ErrKeyExists) {
 		return errKeyExists
