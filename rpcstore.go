@@ -117,7 +117,7 @@ func (s Service) List(ctx context.Context, req *ListRequest) (*ListReply, error)
 
 	limit := req.Count
 	if limit <= 0 {
-		limit = 32
+		limit = 64
 	}
 	if err := s.st.List(ctx, string(req.Start), func(key string) error {
 		if len(rsp.Keys) == limit {
