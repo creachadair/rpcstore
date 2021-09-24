@@ -23,6 +23,7 @@ import (
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/jrpc2"
+	"github.com/creachadair/jrpc2/handler"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/rpcstore"
 )
@@ -76,4 +77,17 @@ func TestCAS(t *testing.T) {
 			t.Errorf("CASKey(%q): got key %q, want %q", input, got, want)
 		}
 	})
+}
+
+func TestPrefix(t *testing.T) {
+	svc := rpcstore.NewService(memstore.New(), nil)
+	loc := server.NewLocal(handler.ServiceMap{
+		"blob": svc.Methods(),
+	}, nil)
+	defer loc.Close()
+
+	rs := rpcstore.NewClient(loc.Client, &rpcstore.StoreOpts{
+		Prefix: "blob.",
+	})
+	storetest.Run(t, rs)
 }
