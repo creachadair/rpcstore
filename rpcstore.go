@@ -26,6 +26,19 @@ import (
 	"github.com/creachadair/jrpc2/handler"
 )
 
+// Since the client and the service must agree on method names, define these as
+// constants that can be shared between the two.
+const (
+	mGet    = "Get"
+	mPut    = "Put"
+	mCASPut = "CASPut"
+	mCASKey = "CASKey"
+	mDelete = "Delete"
+	mSize   = "Size"
+	mList   = "List"
+	mLen    = "Len"
+)
+
 // Service implements a service that adapts RPC requests to a blob.Store.
 type Service struct {
 	st      blob.Store
@@ -38,14 +51,14 @@ func NewService(st blob.Store, opts *ServiceOpts) *Service {
 	s := &Service{st: st}
 	opts.set(s)
 	s.svc = handler.Map{
-		"Get":    handler.New(s.Get),
-		"Put":    handler.New(s.Put),
-		"CASPut": handler.New(s.CASPut),
-		"CASKey": handler.New(s.CASKey),
-		"Delete": handler.New(s.Delete),
-		"Size":   handler.New(s.Size),
-		"List":   handler.New(s.List),
-		"Len":    handler.New(s.Len),
+		mGet:    handler.New(s.Get),
+		mPut:    handler.New(s.Put),
+		mCASPut: handler.New(s.CASPut),
+		mCASKey: handler.New(s.CASKey),
+		mDelete: handler.New(s.Delete),
+		mSize:   handler.New(s.Size),
+		mList:   handler.New(s.List),
+		mLen:    handler.New(s.Len),
 	}
 	return s
 }
@@ -166,13 +179,13 @@ func (s Store) method(name string) string { return s.prefix + name }
 // Get implements a method of blob.Store.
 func (s Store) Get(ctx context.Context, key string) ([]byte, error) {
 	var data []byte
-	err := s.cli.CallResult(ctx, s.method("Get"), KeyRequest{Key: []byte(key)}, &data)
+	err := s.cli.CallResult(ctx, s.method(mGet), KeyRequest{Key: []byte(key)}, &data)
 	return data, unfilterErr(err)
 }
 
 // Put implements a method of blob.Store.
 func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
-	_, err := s.cli.Call(ctx, s.method("Put"), &PutRequest{
+	_, err := s.cli.Call(ctx, s.method(mPut), &PutRequest{
 		Key:     []byte(opts.Key),
 		Data:    opts.Data,
 		Replace: opts.Replace,
@@ -183,27 +196,27 @@ func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 // PutCAS emulates part of the blob.CAS type.
 func (s Store) PutCAS(ctx context.Context, data []byte) (string, error) {
 	var key []byte
-	err := s.cli.CallResult(ctx, s.method("CASPut"), &DataRequest{Data: data}, &key)
+	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{Data: data}, &key)
 	return string(key), err
 }
 
 // Key emulates part of the blob.CAS type.
 func (s Store) Key(ctx context.Context, data []byte) (string, error) {
 	var key []byte
-	err := s.cli.CallResult(ctx, s.method("CASKey"), &DataRequest{Data: data}, &key)
+	err := s.cli.CallResult(ctx, s.method(mCASKey), &DataRequest{Data: data}, &key)
 	return string(key), err
 }
 
 // Delete implements a method of blob.Store.
 func (s Store) Delete(ctx context.Context, key string) error {
-	_, err := s.cli.Call(ctx, s.method("Delete"), KeyRequest{Key: []byte(key)})
+	_, err := s.cli.Call(ctx, s.method(mDelete), KeyRequest{Key: []byte(key)})
 	return unfilterErr(err)
 }
 
 // Size implements a method of blob.Store.
 func (s Store) Size(ctx context.Context, key string) (int64, error) {
 	var size int64
-	err := s.cli.CallResult(ctx, s.method("Size"), KeyRequest{Key: []byte(key)}, &size)
+	err := s.cli.CallResult(ctx, s.method(mSize), KeyRequest{Key: []byte(key)}, &size)
 	return size, unfilterErr(err)
 }
 
@@ -213,7 +226,7 @@ func (s Store) List(ctx context.Context, start string, f func(string) error) err
 	for {
 		// Fetch another batch of keys.
 		var rsp ListReply
-		err := s.cli.CallResult(ctx, s.method("List"), ListRequest{Start: []byte(next)}, &rsp)
+		err := s.cli.CallResult(ctx, s.method(mList), ListRequest{Start: []byte(next)}, &rsp)
 		if err != nil {
 			return err
 		} else if len(rsp.Keys) == 0 {
@@ -239,7 +252,7 @@ func (s Store) List(ctx context.Context, start string, f func(string) error) err
 // Len implements a method of blob.Store.
 func (s Store) Len(ctx context.Context) (int64, error) {
 	var count int64
-	err := s.cli.CallResult(ctx, s.method("Len"), nil, &count)
+	err := s.cli.CallResult(ctx, s.method(mLen), nil, &count)
 	return count, err
 }
 
