@@ -41,9 +41,10 @@ const (
 
 // Service implements a service that adapts RPC requests to a blob.Store.
 type Service struct {
-	st      blob.Store
-	newHash func() hash.Hash
-	svc     handler.Map
+	st     blob.Store
+	svc    handler.Map
+	hasCAS bool
+	cas    blob.CAS // populated iff hasCAS
 }
 
 // NewService constructs a Service that delegates to the given blob.Store.
@@ -73,7 +74,10 @@ func (o *ServiceOpts) set(s *Service) {
 	if o == nil {
 		return
 	}
-	s.newHash = o.Hash
+	if o.Hash != nil {
+		s.hasCAS = true
+		s.cas = blob.NewCAS(s.st, o.Hash)
+	}
 }
 
 // Methods returns a map of the service methods for s.
@@ -97,20 +101,20 @@ func (s Service) Put(ctx context.Context, req *PutRequest) error {
 // CASPut implements content-addressable storage if the service has a hash
 // constructor installed.
 func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
-	if s.newHash == nil {
+	if !s.hasCAS {
 		return nil, errors.New("no content hash is set")
 	}
-	key, err := blob.NewCAS(s.st, s.newHash).PutCAS(ctx, req.Data)
+	key, err := s.cas.PutCAS(ctx, req.Data)
 	return []byte(key), err
 }
 
 // CASKey computes and returns the hash key for the specified data, if the
 // service has a hash constructor installed.
 func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
-	if s.newHash == nil {
+	if !s.hasCAS {
 		return nil, errors.New("no content hash is set")
 	}
-	return []byte(blob.NewCAS(s.st, s.newHash).Key(req.Data)), nil
+	return []byte(s.cas.Key(req.Data)), nil
 }
 
 // Delete handles the corresponding method of blob.Store.
