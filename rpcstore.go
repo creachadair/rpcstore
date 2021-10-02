@@ -29,14 +29,14 @@ import (
 // Since the client and the service must agree on method names, define these as
 // constants that can be shared between the two.
 const (
-	mGet    = "Get"
-	mPut    = "Put"
-	mCASPut = "CASPut"
-	mCASKey = "CASKey"
-	mDelete = "Delete"
-	mSize   = "Size"
-	mList   = "List"
-	mLen    = "Len"
+	mGet    = "get"
+	mPut    = "put"
+	mCASPut = "cas.put"
+	mCASKey = "cas.key"
+	mDelete = "delete"
+	mSize   = "size"
+	mList   = "list"
+	mLen    = "len"
 )
 
 // Service implements a service that adapts RPC requests to a blob.Store.
