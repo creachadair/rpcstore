@@ -66,7 +66,7 @@ func TestCAS(t *testing.T) {
 
 	rs := rpcstore.NewClient(loc.Client, nil)
 	t.Run("CASPut", func(t *testing.T) {
-		key, err := rs.PutCAS(context.Background(), []byte(input))
+		key, err := rs.CASPut(context.Background(), []byte(input))
 		if err != nil {
 			t.Errorf("PutCAS(%q) failed: %v", input, err)
 		} else if got := fmt.Sprintf("%x", key); got != want {
@@ -117,7 +117,7 @@ func TestKeyPrefix(t *testing.T) {
 	}
 
 	// Store a content-addressed key.
-	if key, err := rs.PutCAS(ctx, []byte("test2")); err != nil {
+	if key, err := rs.CASPut(ctx, []byte("test2")); err != nil {
 		t.Fatalf("PutCAS failed: %v", err)
 	} else if !strings.HasPrefix(key, "foo/") {
 		t.Errorf("PutCAS key: got %q, wanted prefix foo/", key)

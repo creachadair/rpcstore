@@ -210,7 +210,7 @@ func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 }
 
 // PutCAS implements part of the blob.CAS type.
-func (s Store) PutCAS(ctx context.Context, data []byte) (string, error) {
+func (s Store) CASPut(ctx context.Context, data []byte) (string, error) {
 	var key []byte
 	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{
 		Data:   data,
