@@ -87,23 +87,39 @@ func (s Service) Put(ctx context.Context, req *PutRequest) error {
 	}))
 }
 
-// CASPut implements content-addressable storage if the service has a hash
-// constructor installed.
+// CASPut implements part of the blob.CAS interface. It reports an error if
+// the underlying store does not implement the CAS methods.
 func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
 	if s.cas == nil {
 		return nil, errNoCAS
 	}
-	key, err := s.cas.PutCAS(ctx, req.Data)
-	return []byte(key), err
+	key, err := s.cas.CASKey(ctx, req.Data)
+	if err != nil {
+		return nil, err
+	}
+	if len(req.Prefix) != 0 {
+		key = string(req.Prefix) + key
+	}
+
+	if err := s.st.Put(ctx, blob.PutOptions{
+		Key:  key,
+		Data: req.Data,
+	}); err != nil && !errors.Is(err, blob.ErrKeyExists) {
+		return nil, err
+	}
+	return []byte(key), nil
 }
 
-// CASKey computes and returns the hash key for the specified data, if the
-// service has a hash constructor installed.
+// CASKey implements part of the blob.CAS interface. It reports an error if the
+// underlying store does not implement the CAS methods.
 func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
 	if s.cas == nil {
 		return nil, errNoCAS
 	}
 	key, err := s.cas.CASKey(ctx, req.Data)
+	if len(req.Prefix) != 0 {
+		key = string(req.Prefix) + key
+	}
 	return []byte(key), err
 }
 
@@ -144,8 +160,9 @@ func (s Service) Len(ctx context.Context) (int64, error) { return s.st.Len(ctx) 
 
 // Store implements the blob.Store interface by calling a JSON-RPC service.
 type Store struct {
-	cli    *jrpc2.Client
-	prefix string
+	cli     *jrpc2.Client
+	mprefix string // prepended to method names
+	kprefix string // prepended to storage keys
 }
 
 // NewClient constructs a Store that delegates through the given client.
@@ -158,29 +175,34 @@ func NewClient(cli *jrpc2.Client, opts *StoreOpts) Store {
 // StoreOpts provide optional settings for a Store client
 type StoreOpts struct {
 	// Insert this prefix on all method names sent to the service.
-	Prefix string
+	ServicePrefix string
+
+	// Insert this prefix on all storage keys sent to the service.
+	KeyPrefix string
 }
 
 func (o *StoreOpts) set(s *Store) {
 	if o == nil {
 		return
 	}
-	s.prefix = o.Prefix
+	s.mprefix = o.ServicePrefix
+	s.kprefix = o.KeyPrefix
 }
 
-func (s Store) method(name string) string { return s.prefix + name }
+func (s Store) method(name string) string { return s.mprefix + name }
+func (s Store) key(name string) []byte    { return []byte(s.kprefix + name) }
 
 // Get implements a method of blob.Store.
 func (s Store) Get(ctx context.Context, key string) ([]byte, error) {
 	var data []byte
-	err := s.cli.CallResult(ctx, s.method(mGet), KeyRequest{Key: []byte(key)}, &data)
+	err := s.cli.CallResult(ctx, s.method(mGet), KeyRequest{Key: s.key(key)}, &data)
 	return data, unfilterErr(err)
 }
 
 // Put implements a method of blob.Store.
 func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 	_, err := s.cli.Call(ctx, s.method(mPut), &PutRequest{
-		Key:     []byte(opts.Key),
+		Key:     s.key(opts.Key),
 		Data:    opts.Data,
 		Replace: opts.Replace,
 	})
@@ -190,20 +212,26 @@ func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 // PutCAS implements part of the blob.CAS type.
 func (s Store) PutCAS(ctx context.Context, data []byte) (string, error) {
 	var key []byte
-	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{Data: data}, &key)
+	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{
+		Data:   data,
+		Prefix: []byte(s.kprefix),
+	}, &key)
 	return string(key), err
 }
 
 // CASKey implements part of the blob.CAS type.
 func (s Store) CASKey(ctx context.Context, data []byte) (string, error) {
 	var key []byte
-	err := s.cli.CallResult(ctx, s.method(mCASKey), &DataRequest{Data: data}, &key)
+	err := s.cli.CallResult(ctx, s.method(mCASKey), &DataRequest{
+		Data:   data,
+		Prefix: []byte(s.kprefix),
+	}, &key)
 	return string(key), err
 }
 
 // Delete implements a method of blob.Store.
 func (s Store) Delete(ctx context.Context, key string) error {
-	_, err := s.cli.Call(ctx, s.method(mDelete), KeyRequest{Key: []byte(key)})
+	_, err := s.cli.Call(ctx, s.method(mDelete), KeyRequest{Key: s.key(key)})
 	return unfilterErr(err)
 }
 
