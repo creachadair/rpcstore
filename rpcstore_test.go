@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/blob/memstore"
 	"github.com/creachadair/ffs/blob/storetest"
 	"github.com/creachadair/jrpc2"
@@ -48,10 +49,8 @@ func TestStore(t *testing.T) {
 }
 
 func TestCAS(t *testing.T) {
-	mem := memstore.New()
-	svc := rpcstore.NewService(mem, &rpcstore.ServiceOpts{
-		Hash: sha1.New,
-	})
+	mem := blob.NewCAS(memstore.New(), sha1.New)
+	svc := rpcstore.NewService(mem, nil)
 
 	loc := server.NewLocal(svc.Methods(), nil)
 	defer loc.Close()

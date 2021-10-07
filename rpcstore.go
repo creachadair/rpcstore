@@ -19,7 +19,6 @@ package rpcstore
 import (
 	"context"
 	"errors"
-	"hash"
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/jrpc2"
@@ -41,44 +40,32 @@ const (
 
 // Service implements a service that adapts RPC requests to a blob.Store.
 type Service struct {
-	st     blob.Store
-	svc    handler.Map
-	hasCAS bool
-	cas    blob.CAS // populated iff hasCAS
+	st  blob.Store
+	cas blob.CAS // populated iff st implements blob.CAS
+	svc handler.Map
 }
 
 // NewService constructs a Service that delegates to the given blob.Store.
 func NewService(st blob.Store, opts *ServiceOpts) *Service {
 	s := &Service{st: st}
-	opts.set(s)
 	s.svc = handler.Map{
 		mGet:    handler.New(s.Get),
 		mPut:    handler.New(s.Put),
-		mCASPut: handler.New(s.CASPut),
-		mCASKey: handler.New(s.CASKey),
 		mDelete: handler.New(s.Delete),
 		mSize:   handler.New(s.Size),
 		mList:   handler.New(s.List),
 		mLen:    handler.New(s.Len),
 	}
+	if cas, ok := st.(blob.CAS); ok {
+		s.cas = cas
+		s.svc[mCASPut] = handler.New(s.CASPut)
+		s.svc[mCASKey] = handler.New(s.CASKey)
+	}
 	return s
 }
 
 // ServiceOpts provides optional settings for constructing a Service.
-type ServiceOpts struct {
-	// Enable content-addressable storage methods using this hash.
-	Hash func() hash.Hash
-}
-
-func (o *ServiceOpts) set(s *Service) {
-	if o == nil {
-		return
-	}
-	if o.Hash != nil {
-		s.hasCAS = true
-		s.cas = blob.NewCAS(s.st, o.Hash)
-	}
-}
+type ServiceOpts struct{}
 
 // Methods returns a map of the service methods for s.
 func (s Service) Methods() jrpc2.Assigner { return s.svc }
@@ -101,7 +88,7 @@ func (s Service) Put(ctx context.Context, req *PutRequest) error {
 // CASPut implements content-addressable storage if the service has a hash
 // constructor installed.
 func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
-	if !s.hasCAS {
+	if s.cas == nil {
 		return nil, errors.New("no content hash is set")
 	}
 	key, err := s.cas.PutCAS(ctx, req.Data)
@@ -111,7 +98,7 @@ func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
 // CASKey computes and returns the hash key for the specified data, if the
 // service has a hash constructor installed.
 func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
-	if !s.hasCAS {
+	if s.cas == nil {
 		return nil, errors.New("no content hash is set")
 	}
 	return []byte(s.cas.Key(req.Data)), nil
