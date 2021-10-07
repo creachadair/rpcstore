@@ -29,6 +29,9 @@ import (
 	"github.com/creachadair/rpcstore"
 )
 
+// Interface satisfaction check.
+var _ blob.CAS = rpcstore.Store{}
+
 func TestStore(t *testing.T) {
 	mem := memstore.New()
 	svc := rpcstore.NewService(mem, nil)
@@ -69,7 +72,7 @@ func TestCAS(t *testing.T) {
 		}
 	})
 	t.Run("CASKey", func(t *testing.T) {
-		key, err := rs.Key(context.Background(), []byte(input))
+		key, err := rs.CASKey(context.Background(), []byte(input))
 		if err != nil {
 			t.Errorf("CASKey(%q) failed: %v", input, err)
 		} else if got := fmt.Sprintf("%x", key); got != want {

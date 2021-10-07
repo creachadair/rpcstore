@@ -38,6 +38,8 @@ const (
 	mLen    = "len"
 )
 
+var errNoCAS = errors.New("store does not implement content addressing")
+
 // Service implements a service that adapts RPC requests to a blob.Store.
 type Service struct {
 	st  blob.Store
@@ -89,7 +91,7 @@ func (s Service) Put(ctx context.Context, req *PutRequest) error {
 // constructor installed.
 func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
 	if s.cas == nil {
-		return nil, errors.New("no content hash is set")
+		return nil, errNoCAS
 	}
 	key, err := s.cas.PutCAS(ctx, req.Data)
 	return []byte(key), err
@@ -99,9 +101,10 @@ func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
 // service has a hash constructor installed.
 func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
 	if s.cas == nil {
-		return nil, errors.New("no content hash is set")
+		return nil, errNoCAS
 	}
-	return []byte(s.cas.Key(req.Data)), nil
+	key, err := s.cas.CASKey(ctx, req.Data)
+	return []byte(key), err
 }
 
 // Delete handles the corresponding method of blob.Store.
@@ -184,15 +187,15 @@ func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 	return unfilterErr(err)
 }
 
-// PutCAS emulates part of the blob.CAS type.
+// PutCAS implements part of the blob.CAS type.
 func (s Store) PutCAS(ctx context.Context, data []byte) (string, error) {
 	var key []byte
 	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{Data: data}, &key)
 	return string(key), err
 }
 
-// Key emulates part of the blob.CAS type.
-func (s Store) Key(ctx context.Context, data []byte) (string, error) {
+// CASKey implements part of the blob.CAS type.
+func (s Store) CASKey(ctx context.Context, data []byte) (string, error) {
 	var key []byte
 	err := s.cli.CallResult(ctx, s.method(mCASKey), &DataRequest{Data: data}, &key)
 	return string(key), err
