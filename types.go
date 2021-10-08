@@ -43,7 +43,7 @@ func (PutRequest) DisallowUnknownFields() {}
 // DataRequest is the request to a method that requires blob data.
 type DataRequest struct {
 	Data   []byte `json:"data"`
-	Prefix []byte `json:"prefix"`
+	Prefix []byte `json:"prefix,omitempty"`
 }
 
 // DisallowUnknownFields enables strict parsing for the jrpc2 package.
