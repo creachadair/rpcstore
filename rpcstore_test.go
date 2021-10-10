@@ -18,7 +18,6 @@ import (
 	"context"
 	"crypto/sha1"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/creachadair/ffs/blob"
@@ -28,7 +27,6 @@ import (
 	"github.com/creachadair/jrpc2/handler"
 	"github.com/creachadair/jrpc2/server"
 	"github.com/creachadair/rpcstore"
-	"github.com/google/go-cmp/cmp"
 )
 
 // Interface satisfaction check.
@@ -83,7 +81,7 @@ func TestCAS(t *testing.T) {
 	})
 }
 
-func TestServicePrefix(t *testing.T) {
+func TestPrefix(t *testing.T) {
 	svc := rpcstore.NewService(memstore.New(), nil)
 	loc := server.NewLocal(handler.ServiceMap{
 		"blob": svc.Methods(),
@@ -91,48 +89,7 @@ func TestServicePrefix(t *testing.T) {
 	defer loc.Close()
 
 	rs := rpcstore.NewClient(loc.Client, &rpcstore.StoreOpts{
-		ServicePrefix: "blob.",
+		Prefix: "blob.",
 	})
 	storetest.Run(t, rs)
-}
-
-func TestKeyPrefix(t *testing.T) {
-	ms := memstore.New()
-	svc := rpcstore.NewService(blob.NewCAS(ms, sha1.New), nil)
-	loc := server.NewLocal(svc.Methods(), nil)
-	defer loc.Close()
-
-	rs := rpcstore.NewClient(loc.Client, &rpcstore.StoreOpts{
-		KeyPrefix: "foo/",
-	})
-
-	ctx := context.Background()
-
-	// Store a conventional (non-content-addressed) key.
-	if err := rs.Put(ctx, blob.PutOptions{
-		Key:  "test1",
-		Data: []byte("hello"),
-	}); err != nil {
-		t.Fatalf("Put failed: %v", err)
-	}
-
-	// Store a content-addressed key.
-	if key, err := rs.CASPut(ctx, []byte("test2")); err != nil {
-		t.Fatalf("PutCAS failed: %v", err)
-	} else if !strings.HasPrefix(key, "foo/") {
-		t.Errorf("PutCAS key: got %q, wanted prefix foo/", key)
-	}
-
-	// echo -n "test2" | shasum -a 1
-	const test2Hash = "\x10\x9f\x4b\x3c\x50\xd7\xb0\xdf\x72\x9d\x29\x9b\xc6\xf8\xe9\xef\x90\x66\x97\x1f"
-
-	// Verify that both keys were properly prefixed with the target.
-	got := ms.Snapshot(make(map[string]string))
-	want := map[string]string{
-		"foo/test1":        "hello",
-		"foo/" + test2Hash: "test2",
-	}
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("Wrong stored keys: (-want, +got)\n%s", diff)
-	}
 }
