@@ -148,8 +148,8 @@ type Store struct {
 	prefix string
 }
 
-// NewClient constructs a Store that delegates through the given client.
-func NewClient(cli *jrpc2.Client, opts *StoreOpts) Store {
+// NewStore constructs a Store that delegates through the given client.
+func NewStore(cli *jrpc2.Client, opts *StoreOpts) Store {
 	s := Store{cli: cli}
 	opts.set(&s)
 	return s
@@ -185,20 +185,6 @@ func (s Store) Put(ctx context.Context, opts blob.PutOptions) error {
 		Replace: opts.Replace,
 	})
 	return unfilterErr(err)
-}
-
-// PutCAS implements part of the blob.CAS type.
-func (s Store) CASPut(ctx context.Context, data []byte) (string, error) {
-	var key []byte
-	err := s.cli.CallResult(ctx, s.method(mCASPut), &DataRequest{Data: data}, &key)
-	return string(key), err
-}
-
-// CASKey implements part of the blob.CAS type.
-func (s Store) CASKey(ctx context.Context, data []byte) (string, error) {
-	var key []byte
-	err := s.cli.CallResult(ctx, s.method(mCASKey), &DataRequest{Data: data}, &key)
-	return string(key), err
 }
 
 // Delete implements a method of blob.Store.
@@ -253,4 +239,28 @@ func (s Store) Len(ctx context.Context) (int64, error) {
 // ServerInfo returns the JSON-RPC server status message.
 func (s Store) ServerInfo(ctx context.Context) (*jrpc2.ServerInfo, error) {
 	return jrpc2.RPCServerInfo(ctx, s.cli)
+}
+
+// CAS implements the blob.CAS interface by calling a JSON-RPC service.
+type CAS struct {
+	Store
+}
+
+// NewCAS constructs a CAS that delegates through the given client.
+func NewCAS(cli *jrpc2.Client, opts *StoreOpts) CAS {
+	return CAS{Store: NewStore(cli, opts)}
+}
+
+// CASPut implements part of the blob.CAS type.
+func (c CAS) CASPut(ctx context.Context, data []byte) (string, error) {
+	var key []byte
+	err := c.cli.CallResult(ctx, c.method(mCASPut), &DataRequest{Data: data}, &key)
+	return string(key), err
+}
+
+// CASKey implements part of the blob.CAS type.
+func (c CAS) CASKey(ctx context.Context, data []byte) (string, error) {
+	var key []byte
+	err := c.cli.CallResult(ctx, c.method(mCASKey), &DataRequest{Data: data}, &key)
+	return string(key), err
 }

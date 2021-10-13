@@ -29,8 +29,9 @@ import (
 	"github.com/creachadair/rpcstore"
 )
 
-// Interface satisfaction check.
-var _ blob.CAS = rpcstore.Store{}
+// Interface satisfaction checks.
+var _ blob.Store = rpcstore.Store{}
+var _ blob.CAS = rpcstore.CAS{}
 
 func TestStore(t *testing.T) {
 	mem := memstore.New()
@@ -44,8 +45,15 @@ func TestStore(t *testing.T) {
 	}
 	t.Logf("Server methods: %+q", si.Methods)
 
-	rs := rpcstore.NewClient(loc.Client, nil)
-	storetest.Run(t, rs)
+	t.Run("Store", func(t *testing.T) {
+		rs := rpcstore.NewStore(loc.Client, nil)
+		storetest.Run(t, rs)
+	})
+	t.Run("CAS", func(t *testing.T) {
+		rs := rpcstore.NewCAS(loc.Client, nil)
+		storetest.Run(t, rs)
+	})
+
 	if err := loc.Close(); err != nil {
 		t.Fatalf("Server close: %v", err)
 	}
@@ -62,7 +70,7 @@ func TestCAS(t *testing.T) {
 	const input = "abcde\n"
 	const want = "ec11312386ad561674f724b8cca7cf1796e26d1d"
 
-	rs := rpcstore.NewClient(loc.Client, nil)
+	rs := rpcstore.NewCAS(loc.Client, nil)
 	t.Run("CASPut", func(t *testing.T) {
 		key, err := rs.CASPut(context.Background(), []byte(input))
 		if err != nil {
@@ -79,6 +87,14 @@ func TestCAS(t *testing.T) {
 			t.Errorf("CASKey(%q): got key %q, want %q", input, got, want)
 		}
 	})
+	t.Run("Len", func(t *testing.T) {
+		n, err := rs.Len(context.Background())
+		if err != nil {
+			t.Errorf("Len failed: %v", err)
+		} else if n != 1 {
+			t.Errorf("Len: got %d, want %d", n, 1)
+		}
+	})
 }
 
 func TestPrefix(t *testing.T) {
@@ -88,7 +104,7 @@ func TestPrefix(t *testing.T) {
 	}, nil)
 	defer loc.Close()
 
-	rs := rpcstore.NewClient(loc.Client, &rpcstore.StoreOpts{
+	rs := rpcstore.NewStore(loc.Client, &rpcstore.StoreOpts{
 		Prefix: "blob.",
 	})
 	storetest.Run(t, rs)
