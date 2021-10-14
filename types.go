@@ -15,8 +15,6 @@
 package rpcstore
 
 import (
-	"errors"
-
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/code"
@@ -76,7 +74,7 @@ var (
 func filterErr(err error) error {
 	if blob.IsKeyNotFound(err) {
 		return errKeyNotFound
-	} else if errors.Is(err, blob.ErrKeyExists) {
+	} else if blob.IsKeyExists(err) {
 		return errKeyExists
 	}
 	return err
