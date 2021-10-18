@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package rpcstore implements the blob.Store that delegates to an underlying
-// store via a JSON-RPC interface.
 package rpcstore
 
 import (
