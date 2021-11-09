@@ -42,7 +42,7 @@ var errNoCAS = errors.New("store does not implement content addressing")
 
 // Service implements a service that adapts RPC requests to a blob.Store.
 //
-// The service defines the following methods:
+// All service instances export the following methods:
 //
 //   Method    JSON Request and response messsages
 //   "get"     {"key":"<storage-key"}
@@ -59,6 +59,9 @@ var errNoCAS = errors.New("store does not implement content addressing")
 //
 //   "list":   {"start":"<storage-key>","count":<integer>}
 //             {"keys":["<storage-key>",...],"next":"<storage-key>"}
+//
+// If the store delegated to the service implements blob.CAS, the service will
+// also export these additional methods:
 //
 //   "cas.put" {"data":"<blob-data>"}
 //             "<storage-key>"
