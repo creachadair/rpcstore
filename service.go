@@ -63,7 +63,7 @@ var errNoCAS = errors.New("store does not implement content addressing")
 //   "cas.put" {"data":"<blob-data>"}
 //             "<storage-key>"
 //
-//   "cas-key" {"data":"<blob-data>"}
+//   "cas.key" {"data":"<blob-data>"}
 //             "<storage-key>"
 //
 // The data formats are:
