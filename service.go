@@ -85,17 +85,17 @@ type Service struct {
 func NewService(st blob.Store, opts *ServiceOpts) *Service {
 	s := &Service{st: st}
 	s.svc = handler.Map{
-		mGet:    handler.New(s.Get),
-		mPut:    handler.New(s.Put),
-		mDelete: handler.New(s.Delete),
-		mSize:   handler.New(s.Size),
-		mList:   handler.New(s.List),
-		mLen:    handler.New(s.Len),
+		mGet:    handler.NewStrict(s.Get),
+		mPut:    handler.NewStrict(s.Put),
+		mDelete: handler.NewStrict(s.Delete),
+		mSize:   handler.NewStrict(s.Size),
+		mList:   handler.NewStrict(s.List),
+		mLen:    handler.NewStrict(s.Len),
 	}
 	if cas, ok := st.(blob.CAS); ok {
 		s.cas = cas
-		s.svc[mCASPut] = handler.New(s.CASPut)
-		s.svc[mCASKey] = handler.New(s.CASKey)
+		s.svc[mCASPut] = handler.NewStrict(s.CASPut)
+		s.svc[mCASKey] = handler.NewStrict(s.CASKey)
 	}
 	return s
 }
