@@ -81,21 +81,30 @@ type Service struct {
 	svc handler.Map
 }
 
+func mustWrap(fn interface{}) handler.Func {
+	fi, err := handler.Check(fn)
+	if err != nil {
+		panic(err)
+	}
+	fi.SetStrict(true)
+	return fi.Wrap()
+}
+
 // NewService constructs a Service that delegates to the given blob.Store.
 func NewService(st blob.Store, opts *ServiceOpts) *Service {
 	s := &Service{st: st}
 	s.svc = handler.Map{
-		mGet:    handler.NewStrict(s.Get),
-		mPut:    handler.NewStrict(s.Put),
-		mDelete: handler.NewStrict(s.Delete),
-		mSize:   handler.NewStrict(s.Size),
-		mList:   handler.NewStrict(s.List),
-		mLen:    handler.NewStrict(s.Len),
+		mGet:    mustWrap(s.Get),
+		mPut:    mustWrap(s.Put),
+		mDelete: mustWrap(s.Delete),
+		mSize:   mustWrap(s.Size),
+		mList:   mustWrap(s.List),
+		mLen:    mustWrap(s.Len),
 	}
 	if cas, ok := st.(blob.CAS); ok {
 		s.cas = cas
-		s.svc[mCASPut] = handler.NewStrict(s.CASPut)
-		s.svc[mCASKey] = handler.NewStrict(s.CASKey)
+		s.svc[mCASPut] = mustWrap(s.CASPut)
+		s.svc[mCASKey] = mustWrap(s.CASKey)
 	}
 	return s
 }
