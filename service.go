@@ -44,37 +44,36 @@ var errNoCAS = errors.New("store does not implement content addressing")
 //
 // All service instances export the following methods:
 //
-//   Method    JSON Request and response messsages
-//   "get"     {"key":"<storage-key"}
-//             "<blob-content>"
+//	Method    JSON Request and response messsages
+//	"get"     {"key":"<storage-key"}
+//	          "<blob-content>"
 //
-//   "put"     {"key":"<storage-key>","data":"<blob-content>","replace":bool}
-//             null
+//	"put"     {"key":"<storage-key>","data":"<blob-content>","replace":bool}
+//	          null
 //
-//   "size"    {"key":"<storage-key>"}
-//             <integer>
+//	"size"    {"key":"<storage-key>"}
+//	          <integer>
 //
-//   "len":    null
-//             <integer>
+//	"len":    null
+//	          <integer>
 //
-//   "list":   {"start":"<storage-key>","count":<integer>}
-//             {"keys":["<storage-key>",...],"next":"<storage-key>"}
+//	"list":   {"start":"<storage-key>","count":<integer>}
+//	          {"keys":["<storage-key>",...],"next":"<storage-key>"}
 //
 // If the store delegated to the service implements blob.CAS, the service will
 // also export these additional methods:
 //
-//   "cas.put" {"data":"<blob-data>"}
-//             "<storage-key>"
+//	"cas.put" {"data":"<blob-data>"}
+//	          "<storage-key>"
 //
-//   "cas.key" {"data":"<blob-data>"}
-//             "<storage-key>"
+//	"cas.key" {"data":"<blob-data>"}
+//	          "<storage-key>"
 //
 // The data formats are:
 //
-//   <storage-key>   : base-64 encoded string (key), example: "a2V5Zm9v"
-//   <blob-content>  : base-64 encoded string (data), example: "ZGF0YWZvbw=="
-//   <integer>       : JSON number with integer value, example: 532
-//
+//	<storage-key>   : base-64 encoded string (key), example: "a2V5Zm9v"
+//	<blob-content>  : base-64 encoded string (data), example: "ZGF0YWZvbw=="
+//	<integer>       : JSON number with integer value, example: 532
 type Service struct {
 	st  blob.Store
 	cas blob.CAS // populated iff st implements blob.CAS
