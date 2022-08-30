@@ -1,5 +1,5 @@
-github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2 h1:/SA4j1dE+Z9Y5otq3A4BYBF87BbIs6iK9G/Q3KYmajo=
-github.com/creachadair/ffs v0.0.0-20220803151334-8447b592c9f2/go.mod h1:oQP2eWfmEYr8EekEMMF3zfuWB/Q3sywjV+EEPVY9qyY=
+github.com/creachadair/ffs v0.0.0-20220829152748-ab1d33a62a05 h1:2KeLK/ZDeacfJs/wm7RPF9xEBVw/oCo2oqZIeJYejcY=
+github.com/creachadair/ffs v0.0.0-20220829152748-ab1d33a62a05/go.mod h1:POAz0qW5XLzTbOKgZCgHAG9X/SF1KkrBCo+3GwphXL8=
 github.com/creachadair/jrpc2 v0.41.1 h1:GnSQNk+vt8B/oayJlfOXVRi4hg8DuB9NsppFGe8iVJ0=
 github.com/creachadair/jrpc2 v0.41.1/go.mod h1:k2mGfjsgE2h2Vo12C9NzZguUzzl3gnfGCmLIvg84pVE=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
