@@ -1,9 +1,9 @@
-github.com/creachadair/ffs v0.0.0-20221011220421-0b65cfffbf3c h1:ihLLpJSEtK1fH8kXwFoUEcoJrk2y4sb6rXwUf9BHu0s=
-github.com/creachadair/ffs v0.0.0-20221011220421-0b65cfffbf3c/go.mod h1:QJpiT9aVcYZxfGWx3cgBk6lBmUcXH8ux9JsAbqj7Yn0=
+github.com/creachadair/ffs v0.0.0-20221012164154-450afdc06316 h1:1/cT8P4pmAL5sfVR27GpNkbNCRDgJtwKzs3JJkJ8zf0=
+github.com/creachadair/ffs v0.0.0-20221012164154-450afdc06316/go.mod h1:cXJ7g0EAn04jN3vrYigErJZ5OE7KCyeuFI9BptZZif4=
 github.com/creachadair/jrpc2 v0.41.2 h1:ap7WYl3vDjyxH1CRC8+mZr62wsZp//SS8YcwCGhgoeM=
 github.com/creachadair/jrpc2 v0.41.2/go.mod h1:nFZVfOp2tDVN0TxXvFVMwlvrrzmSyquzmpKHINww2Mc=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
-golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 h1:cu5kTvlzcw1Q5S9f5ip1/cpiB4nXvw1XYzFPGgzLUOY=
-golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+golang.org/x/sync v0.1.0 h1:wsuoTGHzEhffawBOhz5CYhcrV4IdKZbEyZjBMuTp12o=
+golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
