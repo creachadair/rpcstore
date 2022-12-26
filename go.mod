@@ -3,7 +3,7 @@ module github.com/creachadair/rpcstore
 go 1.18
 
 require (
-	github.com/creachadair/ffs v0.0.0-20221219164233-2998be17922b
+	github.com/creachadair/ffs v0.0.0-20221226180407-922470a3cb4a
 	github.com/creachadair/jrpc2 v0.43.0
 )
 
