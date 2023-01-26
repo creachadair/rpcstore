@@ -115,6 +115,9 @@ func (s Store) Len(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+// Close implements a method of blob.Store.
+func (s Store) Close(_ context.Context) error { return s.cli.Close() }
+
 // ServerInfo returns the JSON-RPC server status message.
 func (s Store) ServerInfo(ctx context.Context) (*jrpc2.ServerInfo, error) {
 	return jrpc2.RPCServerInfo(ctx, s.cli)

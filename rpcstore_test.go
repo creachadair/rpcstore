@@ -33,30 +33,38 @@ import (
 var _ blob.Store = rpcstore.Store{}
 var _ blob.CAS = rpcstore.CAS{}
 
-func TestStore(t *testing.T) {
-	mem := memstore.New()
-	svc := rpcstore.NewService(mem, nil)
-
+func testService(t *testing.T, s blob.Store) *jrpc2.Client {
+	svc := rpcstore.NewService(s, nil)
 	loc := server.NewLocal(svc.Methods(), nil)
+	t.Cleanup(func() {
+		if err := loc.Close(); err != nil {
+			t.Errorf("Server close: %v", err)
+		}
+	})
+	return loc.Client
+}
 
-	si, err := jrpc2.RPCServerInfo(context.Background(), loc.Client)
-	if err != nil {
-		t.Fatalf("Server info: %v", err)
-	}
-	t.Logf("Server methods: %+q", si.Methods)
+func TestStore(t *testing.T) {
+	t.Run("Status", func(t *testing.T) {
+		cli := testService(t, memstore.New())
+		si, err := jrpc2.RPCServerInfo(context.Background(), cli)
+		if err != nil {
+			t.Fatalf("Server info: %v", err)
+		}
+		t.Logf("Server methods: %+q", si.Methods)
+	})
 
 	t.Run("Store", func(t *testing.T) {
-		rs := rpcstore.NewStore(loc.Client, nil)
-		storetest.Run(t, rs)
-	})
-	t.Run("CAS", func(t *testing.T) {
-		rs := rpcstore.NewCAS(loc.Client, nil)
+		cli := testService(t, memstore.New())
+		rs := rpcstore.NewStore(cli, nil)
 		storetest.Run(t, rs)
 	})
 
-	if err := loc.Close(); err != nil {
-		t.Fatalf("Server close: %v", err)
-	}
+	t.Run("CAS", func(t *testing.T) {
+		cli := testService(t, memstore.New())
+		rs := rpcstore.NewCAS(cli, nil)
+		storetest.Run(t, rs)
+	})
 }
 
 func TestCAS(t *testing.T) {
