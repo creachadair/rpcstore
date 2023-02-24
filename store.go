@@ -72,13 +72,6 @@ func (s Store) Delete(ctx context.Context, key string) error {
 	return unfilterErr(err)
 }
 
-// Size implements a method of blob.Store.
-func (s Store) Size(ctx context.Context, key string) (int64, error) {
-	var size int64
-	err := s.cli.CallResult(ctx, s.method(mSize), KeyRequest{Key: []byte(key)}, &size)
-	return size, unfilterErr(err)
-}
-
 // List implements a method of blob.Store.
 func (s Store) List(ctx context.Context, start string, f func(string) error) error {
 	next := start

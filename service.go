@@ -33,7 +33,6 @@ const (
 	mCASPut = "cas.put"
 	mCASKey = "cas.key"
 	mDelete = "delete"
-	mSize   = "size"
 	mList   = "list"
 	mLen    = "len"
 )
@@ -96,7 +95,6 @@ func NewService(st blob.Store, opts *ServiceOpts) *Service {
 		mGet:    mustWrap(s.Get),
 		mPut:    mustWrap(s.Put),
 		mDelete: mustWrap(s.Delete),
-		mSize:   mustWrap(s.Size),
 		mList:   mustWrap(s.List),
 		mLen:    mustWrap(s.Len),
 	}
@@ -152,12 +150,6 @@ func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
 // Delete handles the corresponding method of blob.Store.
 func (s Service) Delete(ctx context.Context, req *KeyRequest) error {
 	return filterErr(s.st.Delete(ctx, string(req.Key)))
-}
-
-// Size handles the corresponding method of blob.Store.
-func (s Service) Size(ctx context.Context, req *KeyRequest) (int64, error) {
-	size, err := s.st.Size(ctx, string(req.Key))
-	return size, filterErr(err)
 }
 
 // List handles the corresponding method of blob.Store.
