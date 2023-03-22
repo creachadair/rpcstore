@@ -47,8 +47,8 @@ func testService(t *testing.T, s blob.Store) *jrpc2.Client {
 func TestStore(t *testing.T) {
 	t.Run("Status", func(t *testing.T) {
 		cli := testService(t, memstore.New())
-		si, err := jrpc2.RPCServerInfo(context.Background(), cli)
-		if err != nil {
+		var si jrpc2.ServerInfo
+		if err := cli.CallResult(context.Background(), "rpc.serverInfo", nil, &si); err != nil {
 			t.Fatalf("Server info: %v", err)
 		}
 		t.Logf("Server methods: %+q", si.Methods)

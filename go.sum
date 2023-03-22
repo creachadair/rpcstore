@@ -1,9 +1,9 @@
 github.com/creachadair/ffs v0.0.0-20230314213740-1655997c2914 h1:6ztz4yQ11te2P24FiiUZU6wx4coO6luB5Aot2KWCNAM=
 github.com/creachadair/ffs v0.0.0-20230314213740-1655997c2914/go.mod h1:2rBjrOZ3CVaSiOAsSma7xBWv9lZsuA2e9OuIrmaiVQI=
-github.com/creachadair/jrpc2 v0.45.0 h1:61Cdy1IbyB3So5+znIQ4eki4P1/j/FiNIy0SS9j3kJY=
-github.com/creachadair/jrpc2 v0.45.0/go.mod h1:O7R/rmcUivGXUkfmbuWevcLv6f1xbKVSoMvmhW4/fr8=
-github.com/creachadair/mds v0.0.0-20230313153906-9788b6f60568 h1:LzMDPh2FLXEHnQNTjGJT+vInPSDVOUTuzqE4GskHTNg=
-github.com/creachadair/mds v0.0.0-20230313153906-9788b6f60568/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
+github.com/creachadair/jrpc2 v1.0.0 h1:MJecUFNbda24o0Qa4CYru5NJvs6BEnmzupdAx3f7+98=
+github.com/creachadair/jrpc2 v1.0.0/go.mod h1:VNiDz7Qbua37RrefUJdMki9dVmsbrQPIQOPy907UvtE=
+github.com/creachadair/mds v0.0.0-20230319162523-c2ef70fc176d h1:WIvSzW0rx1LAEVqE4oLLfYmqwrxY9aytyooR2rOUhB0=
+github.com/creachadair/mds v0.0.0-20230319162523-c2ef70fc176d/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=

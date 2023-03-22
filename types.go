@@ -17,7 +17,6 @@ package rpcstore
 import (
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/code"
 )
 
 // KeyRequest is the request to the Get, Delete, and Size methods.
@@ -67,7 +66,7 @@ func filterErr(err error) error {
 
 // unfilterErr converts JSON-RPC errors back into blob.Store errors.
 func unfilterErr(err error) error {
-	switch code.FromError(err) {
+	switch jrpc2.ErrorCode(err) {
 	case -100:
 		return blob.ErrKeyNotFound
 	case -101:

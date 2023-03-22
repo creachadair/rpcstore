@@ -113,7 +113,11 @@ func (s Store) Close(_ context.Context) error { return s.cli.Close() }
 
 // ServerInfo returns the JSON-RPC server status message.
 func (s Store) ServerInfo(ctx context.Context) (*jrpc2.ServerInfo, error) {
-	return jrpc2.RPCServerInfo(ctx, s.cli)
+	var si jrpc2.ServerInfo
+	if err := s.cli.CallResult(ctx, "rpc.serverInfo", nil, &si); err != nil {
+		return nil, err
+	}
+	return &si, nil
 }
 
 // CAS implements the blob.CAS interface by calling a JSON-RPC service.
