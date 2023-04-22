@@ -131,15 +131,23 @@ func NewCAS(cli *jrpc2.Client, opts *StoreOpts) CAS {
 }
 
 // CASPut implements part of the blob.CAS type.
-func (c CAS) CASPut(ctx context.Context, data []byte) (string, error) {
+func (c CAS) CASPut(ctx context.Context, opts blob.CASPutOptions) (string, error) {
 	var key []byte
-	err := c.cli.CallResult(ctx, c.method(mCASPut), &DataRequest{Data: data}, &key)
+	err := c.cli.CallResult(ctx, c.method(mCASPut), &CASPutRequest{
+		Data:   opts.Data,
+		Prefix: []byte(opts.Prefix),
+		Suffix: []byte(opts.Suffix),
+	}, &key)
 	return string(key), err
 }
 
 // CASKey implements part of the blob.CAS type.
-func (c CAS) CASKey(ctx context.Context, data []byte) (string, error) {
+func (c CAS) CASKey(ctx context.Context, opts blob.CASPutOptions) (string, error) {
 	var key []byte
-	err := c.cli.CallResult(ctx, c.method(mCASKey), &DataRequest{Data: data}, &key)
+	err := c.cli.CallResult(ctx, c.method(mCASKey), &CASPutRequest{
+		Data:   opts.Data,
+		Prefix: []byte(opts.Prefix),
+		Suffix: []byte(opts.Suffix),
+	}, &key)
 	return string(key), err
 }

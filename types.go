@@ -31,9 +31,11 @@ type PutRequest struct {
 	Replace bool   `json:"replace"`
 }
 
-// DataRequest is the request to a method that requires blob data.
-type DataRequest struct {
-	Data []byte `json:"data"`
+// CASPutRequest is the request to the CASPut and CASGet methods.
+type CASPutRequest struct {
+	Data   []byte `json:"data"`
+	Prefix []byte `json:"prefix,omitempty"`
+	Suffix []byte `json:"suffix,omitempty"`
 }
 
 // ListRequest is the request to the List method.

@@ -80,7 +80,7 @@ func TestCAS(t *testing.T) {
 
 	rs := rpcstore.NewCAS(loc.Client, nil)
 	t.Run("CASPut", func(t *testing.T) {
-		key, err := rs.CASPut(context.Background(), []byte(input))
+		key, err := rs.CASPut(context.Background(), blob.CASPutOptions{Data: []byte(input)})
 		if err != nil {
 			t.Errorf("PutCAS(%q) failed: %v", input, err)
 		} else if got := fmt.Sprintf("%x", key); got != want {
@@ -88,7 +88,7 @@ func TestCAS(t *testing.T) {
 		}
 	})
 	t.Run("CASKey", func(t *testing.T) {
-		key, err := rs.CASKey(context.Background(), []byte(input))
+		key, err := rs.CASKey(context.Background(), blob.CASPutOptions{Data: []byte(input)})
 		if err != nil {
 			t.Errorf("CASKey(%q) failed: %v", input, err)
 		} else if got := fmt.Sprintf("%x", key); got != want {

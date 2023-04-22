@@ -62,10 +62,10 @@ var errNoCAS = errors.New("store does not implement content addressing")
 // If the store delegated to the service implements blob.CAS, the service will
 // also export these additional methods:
 //
-//	"cas.put" {"data":"<blob-data>"}
+//	"cas.put" {"data":"<blob-data>", "prefix":"...", "suffix":"..."}
 //	          "<storage-key>"
 //
-//	"cas.key" {"data":"<blob-data>"}
+//	"cas.key" {"data":"<blob-data>", "prefix":"...", "suffix":"..."}
 //	          "<storage-key>"
 //
 // The data formats are:
@@ -129,21 +129,29 @@ func (s Service) Put(ctx context.Context, req *PutRequest) error {
 
 // CASPut implements content-addressable storage if the service has a hash
 // constructor installed.
-func (s Service) CASPut(ctx context.Context, req *DataRequest) ([]byte, error) {
+func (s Service) CASPut(ctx context.Context, req *CASPutRequest) ([]byte, error) {
 	if s.cas == nil {
 		return nil, errNoCAS
 	}
-	key, err := s.cas.CASPut(ctx, req.Data)
+	key, err := s.cas.CASPut(ctx, blob.CASPutOptions{
+		Data:   req.Data,
+		Prefix: string(req.Prefix),
+		Suffix: string(req.Suffix),
+	})
 	return []byte(key), err
 }
 
 // CASKey computes and returns the hash key for the specified data, if the
 // service has a hash constructor installed.
-func (s Service) CASKey(ctx context.Context, req *DataRequest) ([]byte, error) {
+func (s Service) CASKey(ctx context.Context, req *CASPutRequest) ([]byte, error) {
 	if s.cas == nil {
 		return nil, errNoCAS
 	}
-	key, err := s.cas.CASKey(ctx, req.Data)
+	key, err := s.cas.CASKey(ctx, blob.CASPutOptions{
+		Data:   req.Data,
+		Prefix: string(req.Prefix),
+		Suffix: string(req.Suffix),
+	})
 	return []byte(key), err
 }
 
